@@ -1,7 +1,7 @@
 // fitnessFunction
 // n dimension
 // minimax is the lower and upper bound of the n dimensions space.
-// 
+//
 function random_Vector(minmax){
 	if(Array.isArray(minmax)){
     	var randVector=[];
@@ -35,7 +35,12 @@ function get_global_best(population,current_best){
   if(current_best==undefined)
     current_best=null
   // apply sort for population
-  population.sort(function(x,y){return y['cost']-x['cost']})
+  population.sort(function(x,y){
+		if(minimise){
+		return x['cost']-y['cost']
+	}else{
+		return y['cost']-x['cost']
+	}})
   best=population[0]
   if(current_best==undefined || best['cost'] <= current_best['cost']){
     current_best={}
@@ -100,12 +105,15 @@ function search(max_gens,search_space,vel_space,pop_size,max_vel,c1,c2){
       update_best_position(pop[j])
     }
     gbest=get_global_best(pop,gbest)
-    console.log(" > Gen : %d , Fitness : %f",i+1,gbest['cost'])
+    printToBox(" > Generation No : "+(i+1).toString()+" , Fitness Value : "+gbest['cost'].toString())
+    //console.log(" > Gen : %d , Fitness : %f",i+1,gbest['cost'])
   }
   return gbest
 }
 
-function configuration(){
+minimise=null
+
+function configuration(params){
   problem_size=2
   upper_Dimension_Bound=5
   lower_Dimension_Bound=-5
@@ -117,13 +125,44 @@ function configuration(){
     search_space[i]=[lower_Dimension_Bound,upper_Dimension_Bound]
     vel_space[i]=[lower_Velocity_Bound,upper_Velocity_Bound]
   }
-  max_gens=1000
-  pop_size=100
-  max_vel=50.0
+  max_gens=params['generations']
+  pop_size=params['particles']
+  max_vel=params['velocity-limit']
+	minimise=params['min']
   c1=2.0
   c2=2.0
   best=search(max_gens,search_space,vel_space,pop_size,max_vel,c1,c2)
-  console.log("Done ! Solution: Fitness Value:%f Position :",best['cost'])
-  console.log(best['position'])
+  printToBox("")
+  printToBox("Done! Fitness value: "+best['cost'].toString() + " , Position:"+best['position'].toString())
+  //console.log("Done ! Solution: Fitness Value:%f Position :",best['cost'])
+  //console.log(best['position'])
 
+}
+
+function getParams(){
+	params={}
+	params['generations']=Number(document.getElementById("gens").value)
+	params['velocity-limit']=Number(document.getElementById("vel").value)
+	params['particles']=Number(document.getElementById("part").value)
+	return params
+}
+function min(){
+	box.innerHTML=""
+	params=getParams();
+	params['min']=true
+	configuration(params);
+}
+
+function max(){
+	box.innerHTML=""
+	params=getParams();
+	params['min']=false
+	configuration(params);
+}
+
+box="blah"
+window.onload=function(){box=document.getElementById("text-box")}
+
+function printToBox(str){
+  box.innerHTML+="<br>"+str;
 }
