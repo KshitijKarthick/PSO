@@ -20,7 +20,7 @@ function create_Particle(searchSpace,velocitySpace){
     	particle['position']=random_Vector(searchSpace);
     	particle['cost']=fitnessFunction(particle['position']);
       particle['b_position']=[]
-      for(i=0;i<particle['position'].length;i++){
+      for(var i=0;i<particle['position'].length;i++){
     	   particle['b_position'][i]=particle['position'][i];
       }
     	particle['b_cost']=particle['cost'];
@@ -35,27 +35,37 @@ function get_global_best(population,current_best){
   if(current_best==undefined)
     current_best=null
   // apply sort for population
+	console.log("Before Sorting")
+  for(var i=0;i<population.length;i++)
+	 console.log(population[i])
   population.sort(function(x,y){
 		if(minimise){
-		return x['cost']-y['cost']
-	}else{
-		return y['cost']-x['cost']
-	}})
+			return x['cost']-y['cost']
+		}
+		else{
+			return y['cost']-x['cost']
+		}
+	})
+	console.log("After Sorting")
+	for(var i=0;i<population.length;i++)
+   console.log(population[i])
   best=population[0]
   if(current_best==undefined || best['cost'] <= current_best['cost']){
     current_best={}
     //current_best['position']=Array.new(best['position'])
     current_best['position']=[]
-    for(i=0;i<best['position'].length;i++){
+    for(var i=0;i<best['position'].length;i++){
       current_best['position'][i]=best['position'][i]
     }
     current_best['cost']=best['cost']
   }
+  console.log("Current Best")
+	console.log(current_best)
   return current_best
 }
 
 function update_velocity(particle,gbest,max_v,c1,c2){
-  for(i=0;i<particle['velocity'].length;i++){
+  for(var i=0;i<particle['velocity'].length;i++){
     v1=c1*Math.random()*(particle['b_position'][i]-particle['position'][i])
     v2=c2*Math.random()*(gbest['position'][i]-particle['position'][i])
     particle['velocity'][i]=particle['velocity'][i]+v1+v2
@@ -66,10 +76,8 @@ function update_velocity(particle,gbest,max_v,c1,c2){
   }
 }
 
-
-
 function update_position(part,bounds){
-  for(i=0;i<part['position'].length;i++){
+  for(var i=0;i<part['position'].length;i++){
     part['position'][i]+=part['velocity'][i]
     if(part['position'][i]>bounds[i][1]){
       part['position'][i]=bounds[i][1]-Math.abs(part['position'][i]-bounds[i][1])
@@ -97,8 +105,8 @@ function search(max_gens,search_space,vel_space,pop_size,max_vel,c1,c2){
     pop[i]=create_Particle(search_space,vel_space)
   }
   gbest=get_global_best(pop)
-  for(i=0;i<max_gens;i++){
-    for(j=0;j<pop.length;j++){
+  for(var i=0;i<max_gens;i++){
+    for(var j=0;j<pop.length;j++){
       update_velocity(pop[j],gbest,max_vel,c1,c2)
       update_position(pop[j],search_space)
       pop[j]['cost']=fitnessFunction(pop[j]['position'])
@@ -111,8 +119,6 @@ function search(max_gens,search_space,vel_space,pop_size,max_vel,c1,c2){
   return gbest
 }
 
-minimise=null
-
 function configuration(params){
   problem_size=2
   upper_Dimension_Bound=5
@@ -121,7 +127,7 @@ function configuration(params){
   lower_Velocity_Bound=-1
   search_space=Array(problem_size)
   vel_space=Array(problem_size)
-  for(i=0;i<search_space.length;i++){
+  for(var i=0;i<search_space.length;i++){
     search_space[i]=[lower_Dimension_Bound,upper_Dimension_Bound]
     vel_space[i]=[lower_Velocity_Bound,upper_Velocity_Bound]
   }
@@ -160,9 +166,10 @@ function max(){
 	configuration(params);
 }
 
-box="blah"
-window.onload=function(){box=document.getElementById("text-box")}
-
 function printToBox(str){
   box.innerHTML+="<br>"+str;
 }
+
+minimise=null
+box="blah"
+window.onload=function(){box=document.getElementById("text-box")}
